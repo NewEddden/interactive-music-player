@@ -1,0 +1,33 @@
+# Audio files - copyrighted content must not be committed
+MP3/
+*.mp3
+*.wav
+*.flac
+*.aac
+*.ogg
+*.m4a
+
+# Images that may be copyrighted album art
+# (keep your own placeholder/demo images, exclude licensed ones if needed)
+# Images/*.jpg
+# Images/*.webp
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor directories
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Logs
+*.log
+npm-debug.log*
+
+# Dependencies (if you ever add any)
+node_modules/

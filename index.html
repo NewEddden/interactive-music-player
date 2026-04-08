@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <link rel="stylesheet" href="style.css" />
+    <title>PLAYER</title>
+  </head>
+  <body>
+
+    <div class="grain"></div>
+
+    <main class="player-grid">
+
+      <!-- CELL 1: Queue -->
+      <section class="cell cell--queue" id="cell-queue">
+        <div class="cell__label">UP NEXT</div>
+        <div class="queue-stack" id="queueStack"></div>
+      </section>
+
+      <!-- CELL 2: Current Song -->
+      <section class="cell cell--current" id="cell-current">
+        <div class="cell__label">NOW PLAYING</div>
+        <div class="current-art" id="currentArt"></div>
+        <div class="current-meta" id="currentMeta">
+          <div class="meta-name" id="metaName">—</div>
+          <div class="meta-artist" id="metaArtist">—</div>
+          <div class="meta-year" id="metaYear">—</div>
+        </div>
+        <!-- Progress bar -->
+        <div class="progress-wrap">
+          <div class="progress-bar" id="progressBar">
+            <div class="progress-fill" id="progressFill"></div>
+            <div class="progress-thumb" id="progressThumb"></div>
+          </div>
+          <div class="progress-times">
+            <span id="timeElapsed">0:00</span>
+            <span id="timeDuration">0:00</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- CELL 3: Previous Song -->
+      <section class="cell cell--previous" id="cell-previous">
+        <div class="cell__label">PREVIOUS</div>
+        <div class="prev-art" id="previousArt"></div>
+        <div class="prev-meta" id="prevMeta">
+          <div class="meta-name" id="prevName">—</div>
+          <div class="meta-artist" id="prevArtist">—</div>
+        </div>
+      </section>
+
+      <!-- CELL 4: Lyrics -->
+      <section class="cell cell--lyrics" id="cell-lyrics">
+        <div class="cell__label">LYRICS</div>
+        <div class="lyrics-scroll" id="lyricsScroll"></div>
+      </section>
+
+      <!-- CELL 5: Staging / Drag-drop -->
+      <section class="cell cell--stage" id="cell-stage">
+        <div class="cell__label">QUEUE IT</div>
+        <div class="stage-inner">
+          <button class="stage-arrow stage-arrow--up" id="pushUp" title="Move to current">
+            <i class="fa fa-arrow-up"></i>
+          </button>
+          <div class="stage-art" id="stagedArt"></div>
+          <div class="stage-song-name" id="stagedName">—</div>
+          <div class="stage-song-artist" id="stagedArtist">—</div>
+          <button class="stage-arrow stage-arrow--down" id="pullDown" title="Next from queue">
+            <i class="fa fa-arrow-down"></i>
+          </button>
+        </div>
+      </section>
+
+      <!-- CELL 6: Controls -->
+      <section class="cell cell--controls" id="cell-controls">
+        <div class="cell__label">CONTROLS</div>
+        <div class="controls-inner">
+          <div class="volume-row">
+            <i class="fa-solid fa-volume-low vol-icon"></i>
+            <input type="range" class="volume-slider" id="volumeSlider" min="0" max="1" step="0.01" value="1"/>
+            <i class="fa-solid fa-volume-high vol-icon"></i>
+          </div>
+          <div class="transport">
+            <button class="btn-transport" id="backwardBtn" title="Previous">
+              <i class="fa-solid fa-backward-step"></i>
+            </button>
+            <button class="btn-play-pause" id="playPauseBtn" title="Play / Pause">
+              <i class="fa-solid fa-play" id="playIcon"></i>
+              <i class="fa-solid fa-pause" id="pauseIcon" style="display:none"></i>
+            </button>
+            <button class="btn-transport" id="forwardBtn" title="Next">
+              <i class="fa-solid fa-forward-step"></i>
+            </button>
+          </div>
+          <div class="shuffle-row">
+            <button class="btn-mode" id="shuffleBtn" title="Shuffle">
+              <i class="fa-solid fa-shuffle"></i> SHUFFLE
+            </button>
+            <button class="btn-mode" id="repeatBtn" title="Repeat">
+              <i class="fa-solid fa-repeat"></i> REPEAT
+            </button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <audio id="audioPlayer"></audio>
+
+    <script src="lyrics.js"></script>
+    <script src="script2.js"></script>
+  </body>
+</html>

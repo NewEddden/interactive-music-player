@@ -1,0 +1,486 @@
+/* ── Variables ───────────────────────────────────────────────────────────── */
+:root {
+  --bg:        #0a0a0a;
+  --surface:   #111111;
+  --border:    #222222;
+  --accent:    #e8ff47;       /* sharp yellow-green */
+  --accent2:   #ff4766;       /* hot pink for accents */
+  --text:      #f0f0f0;
+  --muted:     #555;
+  --label:     #333;
+  --font-head: 'Bebas Neue', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --gap:       2px;
+  --radius:    0px;
+  --cell-size: 380px;
+}
+
+/* ── Reset ───────────────────────────────────────────────────────────────── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+button { border: none; cursor: pointer; background: none; }
+input  { border: none; outline: none; }
+
+/* ── Grain overlay ───────────────────────────────────────────────────────── */
+.grain {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px;
+}
+
+/* ── Body ────────────────────────────────────────────────────────────────── */
+body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  font-family: var(--font-body);
+  color: var(--text);
+}
+
+/* ── Grid ────────────────────────────────────────────────────────────────── */
+.player-grid {
+  display: grid;
+  grid-template-columns: repeat(3, var(--cell-size));
+  grid-template-rows:    repeat(2, var(--cell-size));
+  gap: var(--gap);
+  border: 1px solid var(--border);
+}
+
+/* ── Cell base ───────────────────────────────────────────────────────────── */
+.cell {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+.cell__label {
+  position: absolute;
+  top: 0; left: 0;
+  font-family: var(--font-head);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+  padding: 8px 12px;
+  z-index: 10;
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  background: var(--surface);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CELL 1 — QUEUE
+   ═══════════════════════════════════════════════════════════════════════════ */
+.cell--queue {
+  background: #0d0d0d;
+}
+
+.queue-stack {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.queue-card {
+  width: 200px;
+  height: 200px;
+  position: absolute;
+  overflow: hidden;
+  transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1),
+              box-shadow 0.4s ease;
+}
+.queue-card img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: brightness(0.85);
+  transition: filter 0.3s ease;
+}
+.queue-card:hover img { filter: brightness(1); }
+.queue-card:hover { z-index: 99 !important; }
+
+/* stacking positions */
+.queue-card:nth-child(1) { right: 22px; bottom: 22px; z-index: 5; box-shadow: -4px -4px 20px rgba(0,0,0,0.8); }
+.queue-card:nth-child(2) { right: 52px; bottom: 44px; z-index: 4; box-shadow: -4px -4px 20px rgba(0,0,0,0.6); }
+.queue-card:nth-child(3) { right: 82px; bottom: 66px; z-index: 3; box-shadow: -4px -4px 20px rgba(0,0,0,0.5); }
+.queue-card:nth-child(4) { right: 112px; bottom: 88px; z-index: 2; box-shadow: -4px -4px 20px rgba(0,0,0,0.4); }
+.queue-card:nth-child(5) { right: 142px; bottom: 110px; z-index: 1; box-shadow: -4px -4px 20px rgba(0,0,0,0.3); }
+
+/* index indicator on each card */
+.queue-card::after {
+  content: attr(data-index);
+  position: absolute;
+  bottom: 6px;
+  right: 8px;
+  font-family: var(--font-head);
+  font-size: 28px;
+  color: rgba(255,255,255,0.15);
+  line-height: 1;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CELL 2 — CURRENT SONG
+   ═══════════════════════════════════════════════════════════════════════════ */
+.cell--current {
+  display: flex;
+  flex-direction: column;
+  padding-top: 32px;
+}
+
+.current-art {
+  width: 100%; 
+  height: 220px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.current-art img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 8s ease;
+}
+.current-art:hover img { transform: scale(1.04); }
+
+.current-meta {
+  padding: 16px 18px 0;
+  flex: 1;
+}
+
+.meta-name {
+  font-family: var(--font-head);
+  font-size: 26px;
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.meta-artist {
+  font-size: 12px;
+  font-weight: 300;
+  color: var(--accent);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+.meta-year {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+  letter-spacing: 0.1em;
+}
+
+/* Progress */
+.progress-wrap {
+  padding: 12px 18px 16px;
+}
+.progress-bar {
+  width: 100%;
+  height: 3px;
+  background: var(--border);
+  position: relative;
+  cursor: pointer;
+  border-radius: 2px;
+}
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.5s linear;
+}
+.progress-thumb {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  position: absolute;
+  top: 50%; left: 0%;
+  transform: translate(-50%, -50%);
+  transition: left 0.5s linear;
+}
+.progress-times {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 6px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.05em;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CELL 3 — PREVIOUS SONG
+   ═══════════════════════════════════════════════════════════════════════════ */
+.cell--previous {
+  display: flex;
+  flex-direction: column;
+  padding-top: 32px;
+}
+.prev-art {
+  width: 100%; height: 220px;
+  overflow: hidden;
+  flex-shrink: 0;
+  filter: grayscale(60%) brightness(0.6);
+  transition: filter 0.4s ease;
+}
+.prev-art:hover { filter: grayscale(0%) brightness(1); }
+.prev-art img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.prev-meta {
+  padding: 16px 18px 0;
+}
+.prev-meta .meta-name {
+  font-size: 20px;
+  color: #888;
+}
+.prev-meta .meta-artist {
+  color: #555;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CELL 4 — LYRICS
+   ═══════════════════════════════════════════════════════════════════════════ */
+.cell--lyrics {
+  background: #f5f5f0;
+  padding-top: 32px;
+}
+.cell--lyrics .cell__label {
+  background: #f5f5f0;
+  color: #aaa;
+  border-color: #e0e0da;
+}
+
+.lyrics-scroll {
+  height: calc(100% - 32px);
+  overflow-y: auto;
+  padding: 20px 22px 22px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.8;
+  color: #1a1a1a;
+}
+.lyrics-scroll::-webkit-scrollbar { width: 4px; }
+.lyrics-scroll::-webkit-scrollbar-track { background: transparent; }
+.lyrics-scroll::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
+
+.lyric-section {
+  font-family: var(--font-head);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: #999;
+  margin-top: 20px;
+  margin-bottom: 4px;
+}
+.lyric-section:first-child { margin-top: 0; }
+
+.lyric-line {
+  color: #1a1a1a;
+  margin: 0;
+  transition: color 0.2s;
+}
+.lyric-line:empty { height: 8px; display: block; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CELL 5 — STAGING
+   ═══════════════════════════════════════════════════════════════════════════ */
+.cell--stage {
+  background: #0e0e0e;
+}
+
+.stage-inner {
+  width: 100%; height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px;
+  padding-top: 44px;
+}
+
+.stage-art {
+  width: 180px; height: 180px;
+  overflow: hidden;
+  outline: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.stage-art img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+.stage-art:hover img { transform: scale(1.06); }
+
+.stage-song-name {
+  font-family: var(--font-head);
+  font-size: 16px;
+  color: var(--text);
+  text-align: center;
+  max-width: 260px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.stage-song-artist {
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.stage-arrow {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 14px;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+  flex-shrink: 0;
+}
+.stage-arrow:hover {
+  border-color: var(--accent) !important;
+  color: var(--accent);
+  background: rgba(232,255,71,0.06);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CELL 6 — CONTROLS
+   ═══════════════════════════════════════════════════════════════════════════ */
+.cell--controls {
+  background: var(--surface);
+}
+.controls-inner {
+  width: 100%; height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  padding-top: 24px;
+}
+
+/* Transport buttons */
+.transport {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.btn-transport {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  border: 1px solid var(--border) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+  font-size: 20px;
+  transition: all 0.2s;
+}
+.btn-transport:hover {
+  border-color: var(--accent) !important;
+  color: var(--accent);
+  background: rgba(232,255,71,0.06);
+}
+
+.btn-play-pause {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: none !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  color: #000;
+  transition: transform 0.15s, background 0.2s;
+  box-shadow: 0 0 40px rgba(232,255,71,0.25);
+}
+.btn-play-pause:hover {
+  transform: scale(1.07);
+  background: #f5ff7a;
+}
+.btn-play-pause:active { transform: scale(0.95); }
+
+/* Volume */
+.volume-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 240px;
+}
+.vol-icon { color: var(--muted); font-size: 13px; flex-shrink: 0; }
+
+.volume-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+  cursor: pointer;
+}
+.volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+}
+
+/* Shuffle / Repeat */
+.shuffle-row {
+  display: flex;
+  gap: 10px;
+}
+.btn-mode {
+  font-family: var(--font-head);
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  color: var(--muted);
+  border: 1px solid var(--border) !important;
+  padding: 7px 14px;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+.btn-mode:hover {
+  color: var(--text);
+  border-color: var(--muted) !important;
+}
+.btn-mode.active {
+  color: var(--accent);
+  border-color: var(--accent) !important;
+  background: rgba(232,255,71,0.06);
+}
+
+/* ── Animations ──────────────────────────────────────────────────────────── */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes artReveal {
+  from { opacity: 0; transform: scale(1.03); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.art-enter { animation: artReveal 0.45s cubic-bezier(0.23, 1, 0.32, 1) forwards; }
+.meta-enter { animation: fadeSlideUp 0.35s ease forwards; }
